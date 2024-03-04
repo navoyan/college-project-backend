@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+
+  mongo-server:
+    image: mongodb/mongodb-community-server:7.0.5-ubuntu2204
+    restart: always
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: admin
+      MONGODB_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - ./data/mongo:/data/db
+    ports:
+      - "27017:27017"
+
+  redis-server:
+    image: redis:7.2.4-alpine
+    restart: always
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
