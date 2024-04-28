@@ -4,6 +4,8 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
+from src.users.schemas import UserRole
+
 from .exceptions import InvalidAccessToken
 from .schemas import TokenData
 from src.config import settings
@@ -21,8 +23,9 @@ async def get_current_token(token: Annotated[str, Depends(oauth2_scheme)]) -> To
         )
 
         return TokenData(
-            email=payload.get("email"),
-            full_name=payload.get("full_name"),
+            email=str(payload.get("email")),
+            full_name=str(payload.get("full_name")),
+            role=UserRole[str(payload.get("role"))],
         )
     except JWTError:
         raise InvalidAccessToken

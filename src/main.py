@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src import mongo, redis, init_setups
+from src import mongo, init_setups
 
 from .tokens.router import router as tokens_router
 from .users.router import router as users_router
@@ -13,7 +13,6 @@ from .users.router import router as users_router
 async def app_lifespan(ctx: FastAPI):
     lifespans = [
         mongo.lifespan(ctx),
-        redis.lifespan(ctx),
         init_setups.lifespan(ctx),
     ]
 

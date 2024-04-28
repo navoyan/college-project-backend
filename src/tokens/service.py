@@ -13,7 +13,7 @@ def create_access_token(user: User) -> str:
     )
 
     return jwt.encode(
-        token_data.dict(),
+        token_data.model_dump(),
         settings.jwt_signing_secret_key,
-        algorithm=settings.jwt_algorithm,
+        algorithm=settings.jwt_signing_algorithm,
     )

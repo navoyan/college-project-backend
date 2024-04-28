@@ -7,18 +7,23 @@ from src.users import service as users_service
 from src.tokens.dependencies import get_current_token
 from src.tokens.schemas import TokenData
 from .exceptions import IncorrectCredentials
-from .schemas import User, UserCredentials
+from .schemas import PersistedUser, User, UserCredentials
 
 
-def get_current_user_using_credentials(credentials: UserCredentials) -> User:
-    user = mongo.users_collection.find_one({"email": credentials.email})
+async def get_current_user_using_credentials(credentials: UserCredentials) -> User:
+    user_dict = await mongo.users_collection.find_one({"email": credentials.email})
+    
+    if not user_dict:
+        raise IncorrectCredentials
 
-    if not user or not users_service.verify_password(
+    user = PersistedUser(**user_dict)
+
+    if not users_service.verify_password(
             credentials.password, user.hashed_password
     ):
         raise IncorrectCredentials
 
-    return user
+    return User(**user_dict)
 
 
 def get_current_user_using_token(

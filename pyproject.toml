@@ -19,6 +19,20 @@ python-multipart = "^0.0.9"
 python-jose = {version = "^3.3", extras = ["cryptography"]}
 passlib = {version = "^1.7", extras = ["bcrypt"]}
 
+[tool.poetry.group.dev.dependencies]
+pyright = "^1.1.36"
+black = {extras = ["d"], version = "^24.4.2"}
+
+[tool.pyright]
+typeCheckingMode = "standard"
+venvPath = "."
+venv = ".venv"
+
+[tool.black]
+line-length = 100
+include = ['\.py?$','\.pyi?$']
+preview = false
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

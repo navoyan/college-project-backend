@@ -1,9 +1,10 @@
+from typing import Any
 from fastapi import HTTPException
 
 
 class DetailedHTTPException(HTTPException):
     status_code: int
-    detail: any
+    detail: Any
     headers: dict[str, str] = {}
 
     def __init__(self) -> None:

@@ -1,3 +1,4 @@
+from pathlib import Path
 from fastapi_mail import ConnectionConfig, FastMail
 
 from src.config import settings
@@ -13,7 +14,7 @@ _client_conf = ConnectionConfig(
     MAIL_SSL_TLS=settings.mail_ssl_tls,
     USE_CREDENTIALS=settings.use_credentials,
     VALIDATE_CERTS=settings.validate_certs,
-    TEMPLATE_FOLDER=settings.mail_template_folder,
+    TEMPLATE_FOLDER=Path(settings.mail_template_folder),
 )
 
 client = FastMail(_client_conf)

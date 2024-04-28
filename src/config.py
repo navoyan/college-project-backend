@@ -34,4 +34,5 @@ class Settings(BaseSettings):
     mail_template_folder: str = "templates"
 
 
-settings = Settings()
+settings = Settings() # type: ignore
+

@@ -6,7 +6,14 @@ from passlib.context import CryptContext
 
 from src import mongo, redis, mail
 from .exceptions import EmailAlreadyExists, InvalidOrExpiredValidationToken
-from .schemas import User, UserDetails, PersistedUser, UserRole, UserCreationRequest, EmailValidationTemplateBody
+from .schemas import (
+    User,
+    UserDetails,
+    PersistedUser,
+    UserRole,
+    UserCreationRequest,
+    EmailValidationTemplateBody,
+)
 
 crypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -36,7 +43,7 @@ async def request_user_creation(details: UserDetails):
         template_body=EmailValidationTemplateBody(
             full_name=details.full_name,
             validation_token=validation_token,
-        ).dict()
+        ).model_dump(),
     )
 
     await mail.client.send_message(email_message_schema, template_name="email_validation.html")
@@ -47,7 +54,9 @@ async def request_user_creation(details: UserDetails):
         hashed_password=crypt_context.hash(details.password),
     )
 
-    await redis.client.set(redis_key, user_creation_request.model_dump_json(), ex=_USER_CREATION_REQUEST_TTL, nx=True)
+    await redis.client.set(
+        redis_key, user_creation_request.model_dump_json(), ex=_USER_CREATION_REQUEST_TTL, nx=True
+    )
 
 
 async def proceed_user_creation(validation_token: str):
@@ -72,19 +81,21 @@ async def create_user_using_details(details: UserDetails, role: UserRole = UserR
         role=role,
         hashed_password=crypt_context.hash(details.password),
     )
-    await mongo.users_collection.insert_one(user.dict())
+    await mongo.users_collection.insert_one(user.model_dump())
 
     return user
 
 
-async def create_user_using_request(request: UserCreationRequest, role: UserRole = UserRole.user) -> User:
+async def create_user_using_request(
+    request: UserCreationRequest, role: UserRole = UserRole.user
+) -> User:
     user = PersistedUser(
         email=request.email,
         full_name=request.full_name,
         role=role,
         hashed_password=request.hashed_password,
     )
-    await mongo.users_collection.insert_one(user.dict())
+    await mongo.users_collection.insert_one(user.model_dump())
 
     return user
 
@@ -95,4 +106,4 @@ def verify_password(plain_password, hashed_password) -> bool:
 
 def generate_email_validation_token() -> str:
     valid_chars = string.ascii_letters + string.digits
-    return ''.join(secrets.choice(valid_chars) for _ in range(32))
+    return "".join(secrets.choice(valid_chars) for _ in range(32))
