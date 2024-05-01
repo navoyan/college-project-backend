@@ -29,7 +29,15 @@ async def get_current_user_using_credentials(
 
 def get_current_user(token_data: Annotated[TokenData, Depends(get_current_token)]) -> User:
     return User(
+        _id=token_data.id,
         email=token_data.email,
         full_name=token_data.full_name,
         role=token_data.role,
     )
+
+
+def get_required_admin_user(user: Annotated[User, Depends(get_current_user)]) -> User:
+    if user.role != UserRole.admin:
+        raise InsufficientUserRights
+
+    return user

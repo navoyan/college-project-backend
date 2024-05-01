@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from bson.objectid import ObjectId
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -23,6 +24,7 @@ async def get_current_token(token: Annotated[str, Depends(oauth2_scheme)]) -> To
         )
 
         return TokenData(
+            id=ObjectId(payload.get("id")),
             email=str(payload.get("email")),
             full_name=str(payload.get("full_name")),
             role=UserRole[str(payload.get("role"))],

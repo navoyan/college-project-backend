@@ -7,6 +7,7 @@ from src.users.schemas import User
 
 def create_access_token(user: User) -> str:
     token_data = TokenData(
+        id=user.id,
         email=user.email,
         full_name=user.full_name,
         role=user.role,

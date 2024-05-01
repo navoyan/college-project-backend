@@ -27,7 +27,7 @@ async def app_lifespan(ctx: FastAPI):
         await lifespan.__aexit__(None, None, None)
 
 
-app = FastAPI(lifespan=app_lifespan, openapi_url="/openapi.json")
+app = FastAPI(lifespan=app_lifespan)
 
 app.add_middleware(
     CORSMiddleware,
