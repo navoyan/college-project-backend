@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import Annotated
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserRole(str, Enum):
@@ -30,6 +31,7 @@ class UserDetails(UserCredentials):
 class UserCreationRequest(BaseModel):
     email: EmailStr
     full_name: str
+    validation_token: str
     hashed_password: str
 
 

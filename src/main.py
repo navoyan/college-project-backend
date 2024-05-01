@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.types import Message
 
 from src import mongo, init_setups
 
@@ -25,7 +27,7 @@ async def app_lifespan(ctx: FastAPI):
         await lifespan.__aexit__(None, None, None)
 
 
-app = FastAPI(lifespan=app_lifespan)
+app = FastAPI(lifespan=app_lifespan, openapi_url="/openapi.json")
 
 app.add_middleware(
     CORSMiddleware,

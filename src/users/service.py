@@ -4,7 +4,7 @@ import string
 from fastapi_mail import MessageSchema, MessageType
 from passlib.context import CryptContext
 
-from src import mongo, redis, mail
+from src import mongo, mail
 from .exceptions import EmailAlreadyExists, InvalidOrExpiredValidationToken
 from .schemas import (
     User,
@@ -16,8 +16,6 @@ from .schemas import (
 )
 
 crypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-_USER_CREATION_REQUEST_TTL = 60 * 60
 
 
 async def find_user(email: str) -> User | None:
@@ -34,7 +32,6 @@ async def request_user_creation(details: UserDetails):
         raise EmailAlreadyExists
 
     validation_token = generate_email_validation_token()
-    redis_key = f"user_creation_request:{validation_token}"
 
     email_message_schema = MessageSchema(
         subject="Validate your email on OUR_APP",
@@ -51,24 +48,25 @@ async def request_user_creation(details: UserDetails):
     user_creation_request = UserCreationRequest(
         email=details.email,
         full_name=details.full_name,
+        validation_token=validation_token,
         hashed_password=crypt_context.hash(details.password),
     )
 
-    await redis.client.set(
-        redis_key, user_creation_request.model_dump_json(), ex=_USER_CREATION_REQUEST_TTL, nx=True
-    )
+    await mongo.user_creation_requests_collection.insert_one(user_creation_request.model_dump())
 
 
 async def proceed_user_creation(validation_token: str):
-    redis_key = f"user_creation_request:{validation_token}"
-    user_creation_request_json = await redis.client.get(redis_key)
-    if not user_creation_request_json:
+    creation_request_dict = await mongo.user_creation_requests_collection.find_one(
+        {"validation_token": validation_token}
+    )
+
+    if not creation_request_dict:
         raise InvalidOrExpiredValidationToken
 
-    user_creation_request = UserCreationRequest.model_validate_json(user_creation_request_json)
+    user_creation_request = UserCreationRequest(**creation_request_dict)
     await create_user_using_request(user_creation_request, role=UserRole.user)
 
-    await redis.client.delete(redis_key)
+    await mongo.user_creation_requests_collection.delete_one({"validation_token": validation_token})
 
 
 async def create_user_using_details(details: UserDetails, role: UserRole = UserRole.user) -> User:

@@ -9,11 +9,6 @@ class Settings(BaseSettings):
     mongo_username: str
     mongo_password: str
 
-    redis_host: str = "localhost"
-    redis_port: int = 6379
-    redis_username: str | None = None
-    redis_password: str | None = None
-
     jwt_signing_secret_key: str
     jwt_signing_algorithm: str = "HS256"
 
