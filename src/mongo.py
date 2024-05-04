@@ -18,6 +18,7 @@ from .config import settings
 users_collection: AgnosticCollection
 user_creation_requests_collection: AgnosticCollection
 quizes_collection: AgnosticCollection
+gifts_collection: AgnosticCollection
 
 
 @asynccontextmanager
@@ -25,6 +26,7 @@ async def lifespan(_):
     global users_collection
     global user_creation_requests_collection
     global quizes_collection
+    global gifts_collection
 
     mongo_client: AgnosticClient = AsyncIOMotorClient(
         host=settings.mongo_host,
@@ -38,6 +40,7 @@ async def lifespan(_):
     users_collection = database.get_collection("users")
     user_creation_requests_collection = database.get_collection("user_creation_requests")
     quizes_collection = database.get_collection("quizes")
+    gifts_collection = database.get_collection("gifts")
 
     yield
 

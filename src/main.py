@@ -8,6 +8,7 @@ from src import mongo, init_setups
 from .tokens.router import router as tokens_router
 from .users.router import router as users_router
 from .quizes.router import router as quizes_router
+from .gifts.router import router as gifts_router
 
 
 @asynccontextmanager
@@ -39,3 +40,4 @@ app.add_middleware(
 app.include_router(tokens_router)
 app.include_router(users_router)
 app.include_router(quizes_router)
+app.include_router(gifts_router)
