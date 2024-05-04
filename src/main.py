@@ -1,14 +1,13 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.types import Message
 
 from src import mongo, init_setups
 
 from .tokens.router import router as tokens_router
 from .users.router import router as users_router
+from .quizes.router import router as quizes_router
 
 
 @asynccontextmanager
@@ -39,3 +38,4 @@ app.add_middleware(
 
 app.include_router(tokens_router)
 app.include_router(users_router)
+app.include_router(quizes_router)
